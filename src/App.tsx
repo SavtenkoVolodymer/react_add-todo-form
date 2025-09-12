@@ -13,8 +13,8 @@ export const App = () => {
 
   const users: User[] = usersFromServer as User[];
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
+  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
 
     const newErrors = {
       title: title.trim() === '',
@@ -50,14 +50,17 @@ export const App = () => {
   return (
     <div className="App" data-cy="app">
       <h1>Add todo form</h1>
+
       <form onSubmit={handleSubmit} data-cy="todoForm">
         <div className="field">
+          <label htmlFor="titleInput">Title</label>
           <input
+            id="titleInput"
             type="text"
             data-cy="titleInput"
             value={title}
-            onChange={e => {
-              setTitle(e.target.value);
+            onChange={(event) => {
+              setTitle(event.target.value);
               if (errors.title) {
                 setErrors(prev => ({ ...prev, title: false }));
               }
@@ -72,11 +75,13 @@ export const App = () => {
         </div>
 
         <div className="field">
+          <label htmlFor="userSelect">User</label>
           <select
+            id="userSelect"
             data-cy="userSelect"
             value={selectedUserId}
-            onChange={e => {
-              setSelectedUserId(e.target.value);
+            onChange={(event) => {
+              setSelectedUserId(event.target.value);
               if (errors.user) {
                 setErrors(prev => ({ ...prev, user: false }));
               }
