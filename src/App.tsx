@@ -8,7 +8,7 @@ import type { User, Todo } from './api/types';
 export const App = () => {
   const [todos, setTodos] = useState<Todo[]>(todosFromServer as Todo[]);
   const [title, setTitle] = useState('');
-  const [selectedUserId, setSelectedUserId] = useState('0');
+  const [selectedUserId, setSelectedUserId] = useState('');
   const [errors, setErrors] = useState({ title: false, user: false });
 
   const users: User[] = usersFromServer as User[];
@@ -18,21 +18,25 @@ export const App = () => {
 
     const newErrors = {
       title: title.trim() === '',
-      user: selectedUserId === '0',
+      user: selectedUserId === '',
     };
 
     setErrors(newErrors);
+
     if (newErrors.title || newErrors.user) {
       return;
     }
 
-    const user = users.find(u => u.id === Number(selectedUserId));
+    const user = users.find(userItem => userItem.id === Number(selectedUserId));
 
     if (!user) {
       return;
     }
 
-    const newId = todos.length ? Math.max(...todos.map(t => t.id)) + 1 : 1;
+    const newId = todos.length
+      ? Math.max(...todos.map(todoItem => todoItem.id)) + 1
+      : 1;
+
     const newTodo: Todo = {
       id: newId,
       title: title.trim(),
@@ -43,7 +47,7 @@ export const App = () => {
 
     setTodos([...todos, newTodo]);
     setTitle('');
-    setSelectedUserId('0');
+    setSelectedUserId('');
     setErrors({ title: false, user: false });
   };
 
@@ -59,16 +63,17 @@ export const App = () => {
             type="text"
             data-cy="titleInput"
             value={title}
-            onChange={(event) => {
+            onChange={event => {
               setTitle(event.target.value);
               if (errors.title) {
                 setErrors(prev => ({ ...prev, title: false }));
               }
             }}
             placeholder="Enter todo title"
+            aria-invalid={errors.title}
           />
           {errors.title && (
-            <span className="error" data-cy="titleError">
+            <span className="error" data-cy="titleError" role="alert">
               Please enter a title
             </span>
           )}
@@ -80,16 +85,15 @@ export const App = () => {
             id="userSelect"
             data-cy="userSelect"
             value={selectedUserId}
-            onChange={(event) => {
+            onChange={event => {
               setSelectedUserId(event.target.value);
               if (errors.user) {
                 setErrors(prev => ({ ...prev, user: false }));
               }
             }}
+            aria-invalid={errors.user}
           >
-            <option value="0" disabled>
-              Choose a user
-            </option>
+            <option value="">Choose a user</option>
             {users.map(user => (
               <option key={user.id} value={user.id}>
                 {user.name}
@@ -97,7 +101,7 @@ export const App = () => {
             ))}
           </select>
           {errors.user && (
-            <span className="error" data-cy="userError">
+            <span className="error" data-cy="userError" role="alert">
               Please choose a user
             </span>
           )}
